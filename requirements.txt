@@ -2,3 +2,4 @@ numpy==1.26.2
 Flask==2.3.2
 pandas==2.1.0
 PyMuPDF==1.22.5
+python-dotenv==1.0.1

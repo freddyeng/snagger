@@ -29,4 +29,6 @@ def index():
     return render_template("index.html", files=files, result=result, file1=file1, file2=file2)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Prefer PORT or FLASK_RUN_PORT env vars; default to 5001 to avoid macOS AirPlay conflict on 5000
+    port = int(os.environ.get("PORT", os.environ.get("FLASK_RUN_PORT", 5001)))
+    app.run(debug=True, port=port)
