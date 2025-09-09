@@ -1,0 +1,35 @@
+# Virtual environment
+.venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Uploaded files (if you don’t want them in git)
+static/uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Flask instance folder (if you use it for configs)
+instance/
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# Byte-compiled / optimized / DLL files
+*.so
+*.dylib
+
+# IDE/editor configs (optional)
+.vscode/
+.idea/

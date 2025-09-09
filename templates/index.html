@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Comparison MVP</title>
+</head>
+<body>
+<h1>Upload a file</h1>
+<form method="POST" enctype="multipart/form-data">
+  <input type="file" name="file" required>
+  <button type="submit">Upload</button>
+</form>
+
+<h2>Uploaded Files</h2>
+<form method="POST">
+  <table border="1" cellpadding="5">
+    <tr>
+      <th>Select File 1</th>
+      <th>Select File 2</th>
+      <th>Filename</th>
+    </tr>
+    {% for f in files %}
+    <tr>
+      <td><input type="radio" name="file1" value="{{ f }}" {% if f==file1 %}checked{% endif %}></td>
+      <td><input type="radio" name="file2" value="{{ f }}" {% if f==file2 %}checked{% endif %}></td>
+      <td>{{ f }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <button type="submit">Compare</button>
+</form>
+
+{% if result is not none %}
+  <h2>Result: {{ "Match!" if result else "Do not match" }}</h2>
+{% endif %}
+</body>
+</html>
