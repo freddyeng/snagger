@@ -36,17 +36,25 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-> Make sure `requirements.txt` includes `Flask` (and optionally `duckdb`, `pandas` if needed for future comparison logic).
+> Make sure `requirements.txt` includes `Flask` and `python-dotenv`. Optional: `pandas`, `PyMuPDF` for future features.
 
 ### 4. Run the Flask app with auto-reload
+
+Option A (recommended, uses `.flaskenv`):
+
+```bash
+flask run
+```
+
+Option B (if `.flaskenv` isn’t being loaded):
 
 ```bash
 export FLASK_APP=app.py
 export FLASK_ENV=development
-flask run
+FLASK_RUN_PORT=5001 flask run
 ```
 
-- Open a browser and go to: [http://127.0.0.1:5000](http://127.0.0.1:5000)  
+- Open a browser and go to: [http://127.0.0.1:5001](http://127.0.0.1:5001)  
 - The server auto-reloads when Python code changes.
 
 ---
@@ -66,6 +74,7 @@ flask run
 snagger/
 │
 ├── .venv/                 # Virtual environment (ignored in repo)
+├── .flaskenv              # Flask CLI defaults (port 5001)
 ├── app.py                 # Flask backend
 ├── compare_utils.py       # File comparison logic
 ├── requirements.txt       # Python dependencies
@@ -86,3 +95,4 @@ snagger/
 - You can expand `compare_utils.py` later for **content-based PDF comparison**.  
 - All Flask Python code changes auto-reload when `FLASK_ENV=development` is set.  
 - Keep `.venv` ignored in your git repo (`.gitignore`) to avoid committing virtual environment files.  
+- Default dev port is 5001 (to avoid macOS AirPlay using 5000). If you prefer 5000, disable AirPlay Receiver or run `flask run --port 5000`.  
