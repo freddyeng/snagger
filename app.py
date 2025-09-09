@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 import os
+import atexit
+import shutil
 from compare_utils import filenames_match
 
 UPLOAD_FOLDER = "static/uploads"
@@ -7,6 +9,13 @@ UPLOAD_FOLDER = "static/uploads"
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# --- Cleanup function ---
+def cleanup():
+    shutil.rmtree(UPLOAD_FOLDER, ignore_errors=True)
+
+atexit.register(cleanup)  # registers the cleanup to run when app exits
+
 
 @app.route("/", methods=["GET", "POST"])
 def index():
