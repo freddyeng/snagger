@@ -29,8 +29,8 @@
   <button type="submit">Compare</button>
 </form>
 
-{% if result is not none %}
-  <h2>Result: {{ "Match!" if result else "Do not match" }}</h2>
+{% if result %}
+  <h2>Result: {{ result }}</h2>
 {% endif %}
 </body>
 </html>
