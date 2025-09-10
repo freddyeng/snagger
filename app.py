@@ -2,7 +2,8 @@ from flask import Flask, render_template, request
 import os
 import atexit
 import shutil
-from compare_utils import filenames_match
+from ai_request import ai_request
+from read_pdf import pdf_to_text
 
 UPLOAD_FOLDER = "static/uploads"
 
@@ -30,12 +31,19 @@ def index():
         files = os.listdir(app.config["UPLOAD_FOLDER"])
 
     # Handle comparison
-    file1 = request.form.get("file1")
-    file2 = request.form.get("file2")
-    if file1 and file2:
-        result = filenames_match(file1, file2)
+    file1_name = request.form.get("file1")
+    file2_name = request.form.get("file2")
 
-    return render_template("index.html", files=files, result=result, file1=file1, file2=file2)
+    if file1_name and file2_name:
+        file1_path = os.path.join(app.config["UPLOAD_FOLDER"], file1_name)
+        file2_path = os.path.join(app.config["UPLOAD_FOLDER"], file2_name)
+
+        text1 = pdf_to_text(file1_path)
+        text2 = pdf_to_text(file2_path)
+    
+        result = ai_request(text1, text2)
+
+    return render_template("index.html", files=files, result=result)
 
 if __name__ == "__main__":
     # Prefer PORT or FLASK_RUN_PORT env vars; default to 5001 to avoid macOS AirPlay conflict on 5000

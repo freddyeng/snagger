@@ -6,11 +6,10 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-  # recommended to store in environment variable
+def ai_request(file1, file2):
+    """Compare two strings."""
 
-# 4. Make a simple request
-response = client.chat.completions.create(model="gpt-3.5-turbo",
-messages=[{"role": "user", "content": "Hello, what is 2+2?"}])
+    response = client.chat.completions.create(model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": f"Hello, are the two strings '{file1}' and '{file2}' the same?"}])
 
-# 5. Print the response
-print(response.choices[0].message.content)
+    return response.choices[0].message.content
