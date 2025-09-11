@@ -1,0 +1,42 @@
+/* File label styling (already have this) */
+.file-label {
+    display: block;
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid #ccc;
+    width: 150px;
+    text-align: center;
+  }
+  
+  .file-label input[type="file"] {
+    display: none; /* hide the actual file input */
+  }
+  
+  /* Table styling */
+  table {
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  th, td {
+    padding: 5px 10px;
+    border: 1px solid #999;
+    text-align: center;
+  }
+  
+  /* Results styling */
+  .result {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #333;
+  }
+  
+  /* Button styling */
+  button {
+    padding: 8px 16px;
+    font-size: 1em;
+    border: 1px solid;
+    color: #333;
+    cursor: pointer;
+  }
+  
