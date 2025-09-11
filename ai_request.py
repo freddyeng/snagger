@@ -7,7 +7,7 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # def ai_request(file1, file2):
-def ai_request(file1):
+def ai_request(file):
     """Compare two strings."""
 
     # response = client.chat.completions.create(model="gpt-3.5-turbo",
@@ -23,15 +23,18 @@ def ai_request(file1):
                     "Return ONLY valid JSON, no explanations."
                     "If any field is missing, set it to null instead of guessing."
                     "For each item, if there is extra information, please add as an array inside 'notes'."
-                    "All totals in the document should be grouped under a single 'totals' object. "
-                    "Include only the totals that are present; keys should be the name of the total (e.g., 'net_total', 'gross_total', 'tax', etc.)."
+                    "Extract all totals as key-value pairs."
+                    "The key should be exactly the text label found in the document (before the number)."
+                    "If the value is on the next line, still capture it."
+                    "Remove currency symbols and convert to numbers."
+                    "Include all totals found; do not guess missing ones."
                 )
             },
             {
                 "role": "user",
                 "content": (
                     f"Extract all items, codes, notes, quantities, and prices from this document:\n\n"
-                    f"{file1}\n\n"
+                    f"{file}\n\n"
                     "Schema:\n"
                     "{\n"
                     "  'order_id': string,\n"
