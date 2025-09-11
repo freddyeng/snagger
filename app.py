@@ -1,3 +1,4 @@
+import json
 from flask import Flask, render_template, request
 import os
 import atexit
@@ -6,61 +7,75 @@ from ai_request import ai_request
 from read_pdf import pdf_to_text
 
 UPLOAD_FOLDER = "static/uploads"
-
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# --- Cleanup function ---
+# --- Cleanup ---
 def cleanup():
     shutil.rmtree(UPLOAD_FOLDER, ignore_errors=True)
 
 atexit.register(cleanup)
 
-# --- Persistent storage (keeps filenames and results) ---
+# --- Persistent storage ---
+num_pairs = 2  # 2×2
 stored_files = {
-    "filenamesA": ["", ""],
-    "filenamesB": ["", ""],
-    "resultsA": [None, None],
-    "resultsB": [None, None]
+    "filenamesA": [""] * num_pairs,
+    "filenamesB": [""] * num_pairs,
+    "results": [None] * num_pairs
 }
 
+# --- Helper to process AI and ensure object ---
+def save_and_process(file, side, index):
+    if file and file.filename != "":
+        path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(path)
+        if side == "A":
+            stored_files["filenamesA"][index] = file.filename
+        else:
+            stored_files["filenamesB"][index] = file.filename
+        return process_file(path)
+    else:
+        # reuse previous result if available
+        prev = stored_files["results"][index] or {}
+        return prev.get("fileA") if side == "A" else prev.get("fileB")
+
 def process_file(file_path):
-    """Read a file path, extract text, and run ai_request."""
+    """Extract text and call AI; return Python object."""
     if not file_path:
         return None
     text = pdf_to_text(file_path)
-    return ai_request(text)
+    raw_result = ai_request(text)
 
+    if isinstance(raw_result, str):
+        try:
+            return json.loads(raw_result)
+        except json.JSONDecodeError:
+            return raw_result
+    return raw_result
+
+# --- Main route ---
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        # Collect uploaded files
         filesA = request.files.getlist("fileA[]")
         filesB = request.files.getlist("fileB[]")
 
-        # Save files and update persistent storage
-        for i, f in enumerate(filesA):
-            if f and f.filename != "":
-                path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
-                f.save(path)
-                stored_files["filenamesA"][i] = f.filename
-                stored_files["resultsA"][i] = process_file(path)
+        for i in range(num_pairs):
+            resultA = save_and_process(filesA[i] if i < len(filesA) else None, "A", i)
+            resultB = save_and_process(filesB[i] if i < len(filesB) else None, "B", i)
 
-        for i, f in enumerate(filesB):
-            if f and f.filename != "":
-                path = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
-                f.save(path)
-                stored_files["filenamesB"][i] = f.filename
-                stored_files["resultsB"][i] = process_file(path)
+            stored_files["results"][i] = {
+                "fileA": resultA,
+                "fileB": resultB,
+                "equal": resultA == resultB
+            }
 
-    # Render template with stored filenames/results
     return render_template(
         "index.html",
         filenamesA=stored_files["filenamesA"],
         filenamesB=stored_files["filenamesB"],
-        resultsA=stored_files["resultsA"],
-        resultsB=stored_files["resultsB"]
+        results=stored_files["results"]
     )
 
 if __name__ == "__main__":
