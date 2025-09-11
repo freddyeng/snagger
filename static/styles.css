@@ -1,0 +1,25 @@
+/* Styles for file-labels */
+.file-label {
+    display: block;
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid #ccc;
+    width: 150px;
+    text-align: center;
+  }
+  
+  .file-label input[type="file"] {
+    display: none; /* hide the actual file input */
+  }
+  
+  /* Table styling */
+  table {
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 5px 10px;
+    border: 1px solid #999;
+    text-align: center;
+  }
+  
