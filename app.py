@@ -32,16 +32,21 @@ def index():
 
     # Handle comparison
     file1_name = request.form.get("file1")
-    file2_name = request.form.get("file2")
+    # file2_name = request.form.get("file2")
 
-    if file1_name and file2_name:
+    # if file1_name and file2_name:
+    if file1_name:
         file1_path = os.path.join(app.config["UPLOAD_FOLDER"], file1_name)
-        file2_path = os.path.join(app.config["UPLOAD_FOLDER"], file2_name)
+        # file2_path = os.path.join(app.config["UPLOAD_FOLDER"], file2_name)
 
         text1 = pdf_to_text(file1_path)
-        text2 = pdf_to_text(file2_path)
-    
-        result = ai_request(text1, text2)
+        # text2 = pdf_to_text(file2_path)
+
+        # if text1 == text2:
+        #     result = "Exact match"
+        # else:
+        #     result = ai_request(text1, text2)
+        result = ai_request(text1)
 
     return render_template("index.html", files=files, result=result)
 

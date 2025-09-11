@@ -1,18 +1,15 @@
-import fitz  # PyMuPDF
-import unicodedata
-import re
+import fitz, unicodedata
 
 def pdf_to_text(pdf_path):
-    """Convert a PDF file to a cleaned single string."""
-    text = ""
+    text = []
     with fitz.open(pdf_path) as doc:
         for page in doc:
-            text += page.get_text()
-    
-    # --- Clean and normalize the text ---
-    text = unicodedata.normalize("NFKC", text)  # normalize Unicode
-    text = "".join(c for c in text if not unicodedata.category(c).startswith("C"))  # remove control chars
-    text = re.sub(r"\s+", " ", text)  # collapse whitespace
-    text = text.strip()  # trim leading/trailing spaces
-    
-    return text
+            page_text = page.get_text("text")
+            # normalize and clean but KEEP line breaks
+            page_text = unicodedata.normalize("NFKC", page_text)
+            page_text = "".join(c for c in page_text if not unicodedata.category(c).startswith("C"))
+            # don't collapse all whitespace — just strip ends of lines
+            page_text = "\n".join(line.strip() for line in page_text.splitlines())
+            text.append(page_text)
+    return "\n\n".join(text)
+
