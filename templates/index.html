@@ -12,6 +12,7 @@
       <tr>
         <th>File A</th>
         <th>File B</th>
+        <th>Comparison</th>
       </tr>
 
       {% for i in range(2) %}
@@ -20,21 +21,36 @@
         <td>
           <label class="file-label">
             <input type="file" name="fileA[]">
-            <span>{{ filenamesA[i] if filenamesA|length > i else "Choose file" }}</span>
+            <span>{{ filenamesA[i] if filenamesA|length > i and filenamesA[i] else "Choose file" }}</span>
           </label>
-          {% if resultsA[i] %}
-          <div class="result">Result: {{ resultsA[i] }}</div>
+      
+          {% if results[i] %}
+          <div class="result">
+            <pre>{{ results[i].fileA | tojson(indent=2) }}</pre>
+          </div>
           {% endif %}
         </td>
-
+      
         <!-- File B -->
         <td>
           <label class="file-label">
             <input type="file" name="fileB[]">
-            <span>{{ filenamesB[i] if filenamesB|length > i else "Choose file" }}</span>
+            <span>{{ filenamesB[i] if filenamesB|length > i and filenamesB[i] else "Choose file" }}</span>
           </label>
-          {% if resultsB[i] %}
-          <div class="result">Result: {{ resultsB[i] }}</div>
+      
+          {% if results[i] %}
+          <div class="result">
+            <pre>{{ results[i].fileB | tojson(indent=2) }}</pre>
+          </div>
+          {% endif %}
+        </td>
+      
+        <!-- Comparison -->
+        <td>
+          {% if results[i] %}
+          <div class="result">
+            <strong>Equal?</strong> {{ results[i].equal }}
+          </div>
           {% endif %}
         </td>
       </tr>

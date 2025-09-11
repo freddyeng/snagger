@@ -39,4 +39,14 @@
     color: #333;
     cursor: pointer;
   }
+
+  /* JSON result styling */
+.result pre {
+  font-family: monospace;
+  font-size: 0.9em;
+  text-align: left;   /* left-aligns the text */
+  white-space: pre;   /* preserves indentation and line breaks */
+  margin-top: 5px;
+}
+
   
