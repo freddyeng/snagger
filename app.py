@@ -1,39 +1,27 @@
 from flask import Flask, render_template, request, session
 import os
 import atexit
-import shutil
 import uuid
-from app_helpers import save_and_process, process_file, storage
+from app_helpers import save_and_process, storage
+from user_files import get_user_folder, cleanup_old_folders
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")  # needed for sessions
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")
 
-UPLOAD_FOLDER = "static/uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-# --- Cleanup ---
-def cleanup():
-    shutil.rmtree(UPLOAD_FOLDER, ignore_errors=True)
-atexit.register(cleanup)
+# --- Cleanup on exit ---
+atexit.register(cleanup_old_folders)
 
 @app.before_request
 def assign_user():
-    # Give each visitor a unique ID
+    # Assign a unique ID to each session
     if "user_id" not in session:
         session["user_id"] = str(uuid.uuid4())
+    cleanup_old_folders()  # optional: clean old folders on each request
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    num_pairs = 2  # adjust as needed
-    user_id = session["user_id"]
-    user_folder = os.path.join(UPLOAD_FOLDER, user_id)
-    os.makedirs(user_folder, exist_ok=True)
-
-    # store results per user to avoid clashes
-    if not hasattr(storage, "user_results"):
-        storage.user_results = {}
-    if user_id not in storage.user_results:
-        storage.user_results[user_id] = {}
+    num_pairs = 2
+    user_folder = get_user_folder()
 
     if request.method == "POST":
         filesA = request.files.getlist("fileA[]")
@@ -43,7 +31,7 @@ def index():
             resultA = save_and_process(filesA[i] if i < len(filesA) else None, "A", i, user_folder)
             resultB = save_and_process(filesB[i] if i < len(filesB) else None, "B", i, user_folder)
 
-            storage.user_results[user_id][i] = {
+            storage.results[i] = {
                 "fileA": resultA,
                 "fileB": resultB,
                 "equal": resultA == resultB
@@ -53,7 +41,7 @@ def index():
         "index.html",
         filenamesA=storage.filenamesA,
         filenamesB=storage.filenamesB,
-        results=storage.user_results.get(user_id, {})
+        results=storage.results
     )
 
 if __name__ == "__main__":
