@@ -28,20 +28,18 @@ def index():
         filesB = request.files.getlist("fileB[]")
 
         for i in range(num_pairs):
-            resultA = save_and_process(filesA[i] if i < len(filesA) else None, "A", i, user_folder)
-            resultB = save_and_process(filesB[i] if i < len(filesB) else None, "B", i, user_folder)
+            save_and_process(filesA[i] if i < len(filesA) else None, "A", i, user_folder)
+            save_and_process(filesB[i] if i < len(filesB) else None, "B", i, user_folder)
 
-            storage.results[i] = {
-                "fileA": resultA,
-                "fileB": resultB,
-                "equal": resultA == resultB
-            }
+    filenamesA = session.get("filenamesA", [""] * num_pairs)
+    filenamesB = session.get("filenamesB", [""] * num_pairs)
+    results = session.get("results", [None] * num_pairs)
 
     return render_template(
         "index.html",
-        filenamesA=storage.filenamesA,
-        filenamesB=storage.filenamesB,
-        results=storage.results
+        filenamesA=filenamesA,
+        filenamesB=filenamesB,
+        results=results
     )
 
 if __name__ == "__main__":
