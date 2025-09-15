@@ -1,31 +1,35 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 import os
 import atexit
-import shutil
-from app_helpers import save_and_process, process_file, storage
+import uuid
+from app_helpers import save_and_process, storage
+from user_files import get_user_folder, cleanup_old_folders
 
-UPLOAD_FOLDER = "static/uploads"
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")
 
-# --- Cleanup ---
-def cleanup():
-    shutil.rmtree(UPLOAD_FOLDER, ignore_errors=True)
+# --- Cleanup on exit ---
+atexit.register(cleanup_old_folders)
 
-atexit.register(cleanup)
+@app.before_request
+def assign_user():
+    # Assign a unique ID to each session
+    if "user_id" not in session:
+        session["user_id"] = str(uuid.uuid4())
+    cleanup_old_folders()  # optional: clean old folders on each request
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    num_pairs = 2  # adjust as needed
+    num_pairs = 2
+    user_folder = get_user_folder()
 
     if request.method == "POST":
         filesA = request.files.getlist("fileA[]")
         filesB = request.files.getlist("fileB[]")
 
         for i in range(num_pairs):
-            resultA = save_and_process(filesA[i] if i < len(filesA) else None, "A", i, UPLOAD_FOLDER)
-            resultB = save_and_process(filesB[i] if i < len(filesB) else None, "B", i, UPLOAD_FOLDER)
+            resultA = save_and_process(filesA[i] if i < len(filesA) else None, "A", i, user_folder)
+            resultB = save_and_process(filesB[i] if i < len(filesB) else None, "B", i, user_folder)
 
             storage.results[i] = {
                 "fileA": resultA,
