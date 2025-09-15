@@ -23,33 +23,35 @@
             <input type="file" name="fileA[]">
             <span>{{ filenamesA[i] if filenamesA|length > i and filenamesA[i] else "Choose file" }}</span>
           </label>
-      
+
           {% if results[i] %}
-          <div class="result">
+          <details class="json-toggle">
+            <summary>Show JSON A</summary>
             <pre>{{ results[i].fileA | tojson(indent=2) }}</pre>
-          </div>
+          </details>
           {% endif %}
         </td>
-      
+
         <!-- File B -->
         <td>
           <label class="file-label">
             <input type="file" name="fileB[]">
             <span>{{ filenamesB[i] if filenamesB|length > i and filenamesB[i] else "Choose file" }}</span>
           </label>
-      
+
           {% if results[i] %}
-          <div class="result">
+          <details class="json-toggle">
+            <summary>Show JSON B</summary>
             <pre>{{ results[i].fileB | tojson(indent=2) }}</pre>
-          </div>
+          </details>
           {% endif %}
         </td>
-      
+
         <!-- Comparison -->
         <td>
           {% if results[i] %}
           <div class="result">
-            <strong>Equal?</strong> {{ results[i].equal }}
+            <strong>Equal?</strong> {{ results[i].equal }}<br>
             <strong>Same number of items?</strong> {{ results[i].items_same_size }}
           </div>
           {% endif %}

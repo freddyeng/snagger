@@ -49,4 +49,23 @@
   margin-top: 5px;
 }
 
+/* Collapsible JSON styling */
+details.json-toggle {
+  text-align: left;       /* keeps JSON left-aligned */
+  margin-top: 5px;
+}
+
+details.json-toggle summary {
+  cursor: pointer;        /* makes summary look clickable */
+  font-weight: bold;      /* optional, makes it stand out */
+  margin-bottom: 2px;
+}
+
+details.json-toggle pre {
+  margin-left: 0;         /* removes extra indentation */
+  font-family: monospace;
+  font-size: 0.9em;
+  white-space: pre;       /* preserves indentation */
+}
+
   
