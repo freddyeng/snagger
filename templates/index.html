@@ -5,10 +5,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-  <h1>Select 2 Pairs of Files</h1>
+  <h1>Select File Pairs</h1>
 
   <form method="POST" enctype="multipart/form-data">
-    <table>
+    <table id="file-pairs-table">
       <tr>
         <th>File A</th>
         <th>File B</th>
@@ -17,60 +17,97 @@
 
       {% for i in range(filenamesA|length) %}
       <tr>
-          <!-- File A -->
-          <td>
-              <label class="file-label">
-                  <input type="file" name="fileA[]">
-                  <span>{{ filenamesA[i] if filenamesA[i] else "Choose file" }}</span>
-              </label>
-              {% if results[i] %}
-              <details class="json-toggle">
-                  <summary>Show JSON A</summary>
-                  <pre>{{ results[i].fileA | tojson(indent=2) }}</pre>
-              </details>
-              {% endif %}
-          </td>
+        <!-- File A -->
+        <td>
+          <label class="file-label">
+            <input type="file" name="fileA[]">
+            <span>{{ filenamesA[i] if filenamesA[i] else "Choose file" }}</span>
+          </label>
+          {% if results[i] and results[i].fileA %}
+          <details class="json-toggle">
+            <summary>Show JSON A</summary>
+            <pre>{{ results[i].fileA | tojson(indent=2) }}</pre>
+          </details>
+          {% endif %}
+        </td>
 
-          <!-- File B -->
-          <td>
-              <label class="file-label">
-                  <input type="file" name="fileB[]">
-                  <span>{{ filenamesB[i] if filenamesB[i] else "Choose file" }}</span>
-              </label>
-              {% if results[i] %}
-              <details class="json-toggle">
-                  <summary>Show JSON B</summary>
-                  <pre>{{ results[i].fileB | tojson(indent=2) }}</pre>
-              </details>
-              {% endif %}
-          </td>
+        <!-- File B -->
+        <td>
+          <label class="file-label">
+            <input type="file" name="fileB[]">
+            <span>{{ filenamesB[i] if filenamesB[i] else "Choose file" }}</span>
+          </label>
+          {% if results[i] and results[i].fileB %}
+          <details class="json-toggle">
+            <summary>Show JSON B</summary>
+            <pre>{{ results[i].fileB | tojson(indent=2) }}</pre>
+          </details>
+          {% endif %}
+        </td>
 
-          <!-- Comparison -->
-          <td>
-              {% if results[i] %}
-              <div class="result">
-                  <strong>Equal?</strong> {{ results[i].equal }}<br>
-                  <strong>Same number of items?</strong> {{ results[i].items_same_size }}<br>
-                  {% if results[i].largest_grand_total %}
-                      <strong>Largest Grand Total:</strong> {{ results[i].largest_grand_total }}
-                  {% endif %}
-              </div>
-              {% endif %}
-          </td>
+        <!-- Comparison -->
+        <td>
+          {% if results[i] %}
+          <div class="result">
+            <strong>Equal?</strong> {{ results[i].equal }}<br>
+            <strong>Same number of items?</strong> {{ results[i].items_same_size }}<br>
+            {% if results[i].largest_grand_total %}
+              <strong>Largest Grand Total:</strong> {{ results[i].largest_grand_total }}
+            {% endif %}
+          </div>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </table>
 
+    <button type="button" id="add-row">Add another file pair</button>
     <button type="submit">Upload & Run AI</button>
   </form>
 
   <script>
-    // Update span with filename on file selection
-    document.querySelectorAll('.file-label input[type="file"]').forEach(input => {
+  // Function to attach "change" listener to file inputs
+  function attachFileListener(input) {
       input.addEventListener('change', function() {
-        this.nextElementSibling.textContent = this.files[0]?.name || "Choose file";
+          this.nextElementSibling.textContent = this.files[0]?.name || "Choose file";
       });
-    });
+  }
+
+  // Attach to all existing inputs on page load
+  document.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
+
+  // Add row button
+  document.getElementById("add-row").addEventListener("click", () => {
+      const table = document.getElementById("file-pairs-table");
+      const newRow = table.insertRow();
+
+      newRow.innerHTML = `
+          <td>
+              <label class="file-label">
+                  <input type="file" name="fileA[]">
+                  <span>Choose file</span>
+              </label>
+              <details class="json-toggle" style="display:none;">
+                  <summary>Show JSON A</summary>
+                  <pre></pre>
+              </details>
+          </td>
+          <td>
+              <label class="file-label">
+                  <input type="file" name="fileB[]">
+                  <span>Choose file</span>
+              </label>
+              <details class="json-toggle" style="display:none;">
+                  <summary>Show JSON B</summary>
+                  <pre></pre>
+              </details>
+          </td>
+          <td></td>
+      `;
+
+      // Attach "change" listener to the new inputs
+      newRow.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
+  });
   </script>
 </body>
 </html>
