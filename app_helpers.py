@@ -6,11 +6,10 @@ from flask import session
 from comparisons import *
 
 class Storage:
-    """Persistent storage for uploaded filenames and AI results."""
-    def __init__(self, num_pairs=2):
-        self.filenamesA = [""] * num_pairs
-        self.filenamesB = [""] * num_pairs
-        self.results = [None] * num_pairs  # list of dicts {"fileA":..., "fileB":..., "equal":...}
+    def __init__(self):
+        self.filenamesA = []
+        self.filenamesB = []
+        self.results = []
 
 storage = Storage()
 
@@ -34,46 +33,53 @@ def save_and_process(file, side, index, upload_folder):
         path = os.path.join(upload_folder, file.filename)
         file.save(path)
 
-        # Store filenames in session
+        # --- Ensure session lists exist ---
         filenames_key = f"filenames{side}"
-        filenames = session.get(filenames_key, [""] * 2)
+        filenames = session.get(filenames_key, [])
+        results = session.get("results", [])
+
+        # Extend lists if index is beyond current length
+        while len(filenames) <= index:
+            filenames.append("")
+        while len(results) <= index:
+            results.append(None)
+
         filenames[index] = file.filename
         session[filenames_key] = filenames
 
         result = process_file(path)
 
-        # Store results in session
-        results = session.get("results", [None] * 2)
-        if not results or len(results) < 2:
-            results = [None] * 2
+        # Get previous JSONs safely
         prevA = results[index]["fileA"] if results[index] and "fileA" in results[index] else None
         prevB = results[index]["fileB"] if results[index] and "fileB" in results[index] else None
+
+        # Build new result dict
         if side == "A":
+            other_file = prevB
             results[index] = {
                 "fileA": result,
                 "fileB": prevB,
-                "equal": result == prevB if prevB is not None else False,
                 "items_same_size": items_count_equal(result, prevB) if prevB is not None else None,
                 "largest_grand_total": format_largest_grand_total(
                     largest_grand_total_key(result, prevB)
                 ) if prevB is not None else None,
             }
         else:
+            other_file = prevA
             results[index] = {
                 "fileA": prevA,
                 "fileB": result,
-                "equal": prevA == result if prevA is not None else False,
                 "items_same_size": items_count_equal(prevA, result) if prevA is not None else None,
                 "largest_grand_total": format_largest_grand_total(
                     largest_grand_total_key(prevA, result)
                 ) if prevA is not None else None,
-
             }
-        session["results"] = results
 
+        session["results"] = results
         return result
+
     else:
         # Preserve previous result if no new file uploaded
-        results = session.get("results", [None] * 2)
-        prev = results[index] or {}
+        results = session.get("results", [])
+        prev = results[index] if len(results) > index and results[index] else {}
         return prev.get("fileA") if side == "A" else prev.get("fileB")
