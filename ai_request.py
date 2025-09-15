@@ -6,8 +6,16 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def ai_request(file: str):
-    """Extract structured order data from a document string and return JSON."""
+def ai_request(file: str) -> dict:
+    """
+    Parse a document and extract structured order data as JSON.
+
+    Args:
+        file (str): The text content of the document.
+
+    Returns:
+        dict: Parsed order data in the specified schema.
+    """
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -29,8 +37,7 @@ def ai_request(file: str):
             {
                 "role": "user",
                 "content": (
-                    f"Extract all items, codes, notes, quantities, and prices from this document:\n\n"
-                    f"{file}\n\n"
+                    f"Extract all items, codes, notes, quantities, and prices from this document:\n\n{file}\n\n"
                     "Schema:\n"
                     "{\n"
                     "  'order_id': string,\n"
@@ -50,7 +57,7 @@ def ai_request(file: str):
             }
         ],
         max_tokens=800,
-        response_format={"type": "json_object"}  # new SDK enforces JSON
+        response_format={"type": "json_object"}  # ensures JSON object output
     )
 
-    return response.choices[0].message["content"]
+    return response.choices[0].message.content
