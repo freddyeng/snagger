@@ -20,20 +20,29 @@ def assign_user():
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    num_pairs = 2
     user_folder = get_user_folder()
+
+    # Ensure session lists exist; start with 1 empty row
+    if "filenamesA" not in session:
+        session["filenamesA"] = [""]
+    if "filenamesB" not in session:
+        session["filenamesB"] = [""]
+    if "results" not in session:
+        session["results"] = [None]
+
+    filenamesA = session["filenamesA"]
+    filenamesB = session["filenamesB"]
+    results = session["results"]
 
     if request.method == "POST":
         filesA = request.files.getlist("fileA[]")
         filesB = request.files.getlist("fileB[]")
 
-        for i in range(num_pairs):
+        num_rows = max(len(filesA), len(filesB), len(filenamesA))
+        
+        for i in range(num_rows):
             save_and_process(filesA[i] if i < len(filesA) else None, "A", i, user_folder)
             save_and_process(filesB[i] if i < len(filesB) else None, "B", i, user_folder)
-
-    filenamesA = session.get("filenamesA", [""] * num_pairs)
-    filenamesB = session.get("filenamesB", [""] * num_pairs)
-    results = session.get("results", [None] * num_pairs)
 
     return render_template(
         "index.html",
