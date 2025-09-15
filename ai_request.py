@@ -6,12 +6,8 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# def ai_request(file1, file2):
-def ai_request(file):
-    """Compare two strings."""
-
-    # response = client.chat.completions.create(model="gpt-3.5-turbo",
-    # messages=[{"role": "user", "content": f"Hello, are the two strings '{file1}' and '{file2}' the same?"}])
+def ai_request(file: str):
+    """Extract structured order data from a document string and return JSON."""
 
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -54,7 +50,7 @@ def ai_request(file):
             }
         ],
         max_tokens=800,
-        response_format={ "type": "json_object" }  # forces JSON in new API
+        response_format={"type": "json_object"}  # new SDK enforces JSON
     )
 
-    return response.choices[0].message.content
+    return response.choices[0].message["content"]
