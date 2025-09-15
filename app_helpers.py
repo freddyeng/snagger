@@ -3,7 +3,7 @@ import json
 from read_pdf import pdf_to_text
 from ai_request import ai_request
 from flask import session
-from comparisons import items_count_equal
+from comparisons import *
 
 class Storage:
     """Persistent storage for uploaded filenames and AI results."""
@@ -54,6 +54,9 @@ def save_and_process(file, side, index, upload_folder):
                 "fileB": prevB,
                 "equal": result == prevB if prevB is not None else False,
                 "items_same_size": items_count_equal(result, prevB) if prevB is not None else None,
+                "largest_grand_total": format_largest_grand_total(
+                    largest_grand_total_key(result, prevB)
+                ) if prevB is not None else None,
             }
         else:
             results[index] = {
@@ -61,6 +64,10 @@ def save_and_process(file, side, index, upload_folder):
                 "fileB": result,
                 "equal": prevA == result if prevA is not None else False,
                 "items_same_size": items_count_equal(prevA, result) if prevA is not None else None,
+                "largest_grand_total": format_largest_grand_total(
+                    largest_grand_total_key(prevA, result)
+                ) if prevA is not None else None,
+
             }
         session["results"] = results
 
