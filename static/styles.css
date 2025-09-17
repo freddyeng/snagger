@@ -68,4 +68,18 @@ details.json-toggle pre {
   white-space: pre;       /* preserves indentation */
 }
 
+/* Base table styling */
+table.dataframe {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+table.dataframe th, table.dataframe td {
+  border: 1px solid #ddd;
+  padding: 0.5em;
+}
+table.dataframe th {
+  background-color: #f2f2f2;
+}
+
   
