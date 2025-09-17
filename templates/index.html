@@ -7,25 +7,7 @@
 <body>
   <h1>Select File Pairs</h1>
 
-  <!-- Buttons above table -->
-  <div class="button-row">
-    <div class="left-buttons">
-      <form id="addRowForm" method="POST">
-        <button type="button" id="add-row">Add another file pair</button>
-      </form>
-
-      <form id="uploadSubmitForm" method="POST" enctype="multipart/form-data" action="/">
-        <button type="submit" form="uploadForm">Upload & Run AI</button>
-      </form>
-
-      <form id="clearAllForm" method="post" action="/clear_all_data">
-        <button type="submit">Clear All Data</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- File upload table -->
-  <form id="uploadForm" method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data">
     <table id="file-pairs-table">
       <thead>
         <tr>
@@ -38,6 +20,7 @@
       <tbody>
         {% for i in range(filenamesA|length) %}
         <tr>
+          <!-- File A -->
           <td>
             <label class="file-label">
               <input type="file" name="fileA[]">
@@ -51,6 +34,7 @@
             {% endif %}
           </td>
 
+          <!-- File B -->
           <td>
             <label class="file-label">
               <input type="file" name="fileB[]">
@@ -64,6 +48,7 @@
             {% endif %}
           </td>
 
+          <!-- Comparison Info -->
           <td>
             {% if results[i] %}
               {% if results[i].items_same_size is not none %}
@@ -75,6 +60,7 @@
             {% endif %}
           </td>
 
+          <!-- Items Tables (side by side) -->
           <td>
             {% if results[i] and results[i].items_detail %}
               {{ results[i].items_detail }}
@@ -84,33 +70,38 @@
         {% endfor %}
       </tbody>
     </table>
+
+    <button type="button" id="add-row">Add another file pair</button>
+    <button type="submit">Upload & Run AI</button>
   </form>
 
   <script>
-    function attachFileListener(input) {
+  // Update file label text on selection
+  function attachFileListener(input) {
       input.addEventListener('change', function() {
-        this.nextElementSibling.textContent = this.files[0]?.name || "Choose file";
+          this.nextElementSibling.textContent = this.files[0]?.name || "Choose file";
       });
-    }
-    document.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
+  }
+  document.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
 
-    document.getElementById("add-row").addEventListener("click", () => {
+  // Add new row dynamically
+  document.getElementById("add-row").addEventListener("click", () => {
       const tableBody = document.getElementById("file-pairs-table").querySelector('tbody');
       const newRow = tableBody.insertRow();
       newRow.innerHTML = `
-        <td>
-          <label class="file-label"><input type="file" name="fileA[]"><span>Choose file</span></label>
-          <details style="display:none;"><summary>Show JSON A</summary><pre></pre></details>
-        </td>
-        <td>
-          <label class="file-label"><input type="file" name="fileB[]"><span>Choose file</span></label>
-          <details style="display:none;"><summary>Show JSON B</summary><pre></pre></details>
-        </td>
-        <td></td>
-        <td></td>
+          <td>
+              <label class="file-label"><input type="file" name="fileA[]"><span>Choose file</span></label>
+              <details style="display:none;"><summary>Show JSON A</summary><pre></pre></details>
+          </td>
+          <td>
+              <label class="file-label"><input type="file" name="fileB[]"><span>Choose file</span></label>
+              <details style="display:none;"><summary>Show JSON B</summary><pre></pre></details>
+          </td>
+          <td></td>
+          <td></td>
       `;
       newRow.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
-    });
+  });
   </script>
 </body>
 </html>
