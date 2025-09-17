@@ -51,6 +51,17 @@ def index():
         results=results
     )
 
+@app.route("/clear_all_data", methods=["POST"])
+def clear_all_data():
+    user_folder = get_user_folder()
+    session.clear()
+    # Remove the user's upload folder and its contents
+    import shutil
+    import os
+    if os.path.exists(user_folder):
+        shutil.rmtree(user_folder)
+    return ("", 204)
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", os.environ.get("FLASK_RUN_PORT", 5001)))
     app.run(debug=True, port=port)

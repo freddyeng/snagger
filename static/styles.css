@@ -1,74 +1,70 @@
-/* File label styling (already have this) */
+/* File label styling */
 .file-label {
-    display: block;
-    cursor: pointer;
-    padding: 5px;
-    border: 1px solid #ccc;
-    width: 150px;
-    text-align: center;
-  }
-  
-  .file-label input[type="file"] {
-    display: none; /* hide the actual file input */
-  }
-  
-  /* Table styling */
-  table {
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  
-  th, td {
-    padding: 5px 10px;
-    border: 1px solid #999;
-    text-align: center;
-  }
-  
-  /* Results styling */
-  .result {
-    margin-top: 5px;
-    font-size: 0.9em;
-    color: #333;
-  }
-  
-  /* Button styling */
-  button {
-    padding: 8px 16px;
-    font-size: 1em;
-    border: 1px solid;
-    color: #333;
-    cursor: pointer;
-  }
+  display: block;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid #ccc;
+  width: 150px;
+  text-align: center;
+}
+.file-label input[type="file"] {
+  display: none; /* hide the actual file input */
+}
 
-  /* JSON result styling */
+/* Table styling */
+table {
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+th, td {
+  padding: 5px 10px;
+  border: 1px solid #999;
+  text-align: center;
+}
+
+/* Results styling */
+.result {
+  margin-top: 5px;
+  font-size: 0.9em;
+  color: #333;
+}
+
+/* Button styling */
+button {
+  padding: 8px 16px;
+  font-size: 1em;
+  border: 1px solid;
+  color: #333;
+  cursor: pointer;
+}
+
+/* JSON result styling */
 .result pre {
   font-family: monospace;
   font-size: 0.9em;
-  text-align: left;   /* left-aligns the text */
-  white-space: pre;   /* preserves indentation and line breaks */
+  text-align: left;
+  white-space: pre;
   margin-top: 5px;
 }
 
 /* Collapsible JSON styling */
 details.json-toggle {
-  text-align: left;       /* keeps JSON left-aligned */
+  text-align: left;
   margin-top: 5px;
 }
-
 details.json-toggle summary {
-  cursor: pointer;        /* makes summary look clickable */
-  font-weight: bold;      /* optional, makes it stand out */
+  cursor: pointer;
+  font-weight: bold;
   margin-bottom: 2px;
 }
-
 details.json-toggle pre {
-  margin-left: 0;         /* removes extra indentation */
+  margin-left: 0;
   font-family: monospace;
   font-size: 0.9em;
-  white-space: pre;       /* preserves indentation */
+  white-space: pre;
 }
 
-/* Base table styling */
+/* Base table styling for pandas tables */
 table.dataframe {
   border-collapse: collapse;
   width: 100%;
@@ -85,13 +81,26 @@ table.dataframe th {
 /* Side-by-side layout for formatter tables */
 .items-comparison-side-by-side {
   display: flex;
-  gap: 2em;          /* space between tables */
-  flex-wrap: wrap;    /* allows stacking on narrow screens */
+  gap: 2em;
+  flex-wrap: wrap;
 }
-
 .items-comparison-side-by-side .table-wrapper {
-  flex: 1 1 45%;      /* roughly half width each */
-  min-width: 300px;   /* prevents tables from shrinking too much */
+  flex: 1 1 45%;
+  min-width: 300px;
 }
 
-  
+/* Buttons layout */
+/* Align buttons to the left above the table */
+.button-row {
+  display: flex;
+  justify-content: flex-start; /* left-aligned */
+  gap: 10px; /* space between button forms */
+  margin-bottom: 15px; /* spacing above table */
+}
+.left-buttons {
+  display: flex;
+  gap: 10px;
+}
+.button-row form {
+  margin: 0; /* remove default form margins */
+}
