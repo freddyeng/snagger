@@ -4,6 +4,7 @@ from read_pdf import pdf_to_text
 from ai_request import ai_request
 from flask import session
 from comparisons import *
+from formatters import *
 
 class Storage:
     def __init__(self):
@@ -55,7 +56,6 @@ def save_and_process(file, side, index, upload_folder):
 
         # Build new result dict
         if side == "A":
-            other_file = prevB
             results[index] = {
                 "fileA": result,
                 "fileB": prevB,
@@ -63,9 +63,11 @@ def save_and_process(file, side, index, upload_folder):
                 "largest_grand_total": format_largest_grand_total(
                     largest_grand_total_key(result, prevB)
                 ) if prevB is not None else None,
+                "items_detail": format_items_tables(
+                    *items_comparison(result, prevB).values()
+                ) if prevB is not None else None
             }
         else:
-            other_file = prevA
             results[index] = {
                 "fileA": prevA,
                 "fileB": result,
@@ -73,6 +75,9 @@ def save_and_process(file, side, index, upload_folder):
                 "largest_grand_total": format_largest_grand_total(
                     largest_grand_total_key(prevA, result)
                 ) if prevA is not None else None,
+                "items_detail": format_items_tables(
+                    *items_comparison(prevA, result).values()
+                ) if prevA is not None else None
             }
 
         session["results"] = results

@@ -1,7 +1,4 @@
-def jsons_equal(json1, json2):
-    """Check if the two JSONs are fully equal."""
-    return json1 == json2
-
+import pandas as pd
 
 def items_count_equal(json1, json2):
     """Check if 'items' arrays are the same length."""
@@ -43,12 +40,21 @@ def largest_grand_total_key(json1, json2):
         "keys_match": value1 == value2
     }
 
-def format_largest_grand_total(gt_result):
-    """
-    Takes the dict from largest_grand_total_key and returns a single string:
-    "<keys_match>, <json1_key>:<json1_value>, <json2_key>:<json2_value>"
-    Returns None if input is None.
-    """
-    if not gt_result:
-        return None
-    return f'{gt_result["keys_match"]}, {gt_result["json1_key"]}:{gt_result["json1_value"]}, {gt_result["json2_key"]}:{gt_result["json2_value"]}'
+def items_comparison(json1, json2):
+    """ Match line items and compare quantities, unit cost and total cost. """
+
+    df1 = pd.DataFrame(json1["items"])
+    df2 = pd.DataFrame(json2["items"])
+
+    selected_columns = ["item_code", "quantity", "unit_price", "total_price"]
+
+    df1_key_cols = df1[selected_columns]
+    df2_key_cols = df2[selected_columns]
+    
+    df1_sorted = df1_key_cols.sort_values(by=["unit_price", "quantity"], ascending=[False, False])
+    df2_sorted = df2_key_cols.sort_values(by=["unit_price", "quantity"], ascending=[False, False])
+
+    return {
+        "json1_items": df1_sorted,
+        "json2_items": df2_sorted,
+    }
