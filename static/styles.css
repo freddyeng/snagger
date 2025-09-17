@@ -82,4 +82,16 @@ table.dataframe th {
   background-color: #f2f2f2;
 }
 
+/* Side-by-side layout for formatter tables */
+.items-comparison-side-by-side {
+  display: flex;
+  gap: 2em;          /* space between tables */
+  flex-wrap: wrap;    /* allows stacking on narrow screens */
+}
+
+.items-comparison-side-by-side .table-wrapper {
+  flex: 1 1 45%;      /* roughly half width each */
+  min-width: 300px;   /* prevents tables from shrinking too much */
+}
+
   
