@@ -1,28 +1,22 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, current_app
 import os
-import atexit
-import uuid
-from app_helpers import save_and_process, storage
-from user_files import get_user_folder, cleanup_old_folders
+import shutil
+from app_helpers import save_and_process  # your existing save/process logic
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")
 
-# --- Cleanup on exit ---
-atexit.register(cleanup_old_folders)
+UPLOAD_FOLDER = "static/uploads"
 
-@app.before_request
-def assign_user():
-    # Assign a unique ID to each session
-    if "user_id" not in session:
-        session["user_id"] = str(uuid.uuid4())
-    cleanup_old_folders()  # optional: clean old folders on each request
+def get_upload_folder():
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    return UPLOAD_FOLDER
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    user_folder = get_user_folder()
+    folder = get_upload_folder()
 
-    # Ensure session lists exist; start with 1 empty row
+    # initialize session keys
     if "filenamesA" not in session:
         session["filenamesA"] = [""]
     if "filenamesB" not in session:
@@ -37,12 +31,11 @@ def index():
     if request.method == "POST":
         filesA = request.files.getlist("fileA[]")
         filesB = request.files.getlist("fileB[]")
-
         num_rows = max(len(filesA), len(filesB), len(filenamesA))
-        
+
         for i in range(num_rows):
-            save_and_process(filesA[i] if i < len(filesA) else None, "A", i, user_folder)
-            save_and_process(filesB[i] if i < len(filesB) else None, "B", i, user_folder)
+            save_and_process(filesA[i] if i < len(filesA) else None, "A", i, folder)
+            save_and_process(filesB[i] if i < len(filesB) else None, "B", i, folder)
 
     return render_template(
         "index.html",
@@ -51,6 +44,29 @@ def index():
         results=results
     )
 
+@app.route("/clear_all_data", methods=["POST"])
+def clear_all_data():
+    folder = get_upload_folder()
+    current_app.logger.info(f"Clearing files in {folder}: {os.listdir(folder)}")
+
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                current_app.logger.info(f"Deleted file: {file_path}")
+        except Exception as e:
+            current_app.logger.error(f"Failed to delete {file_path}: {e}")
+
+    # Reset session
+    session.clear()
+    session["filenamesA"] = [""]
+    session["filenamesB"] = [""]
+    session["results"] = [None]
+
+    current_app.logger.info("Session cleared (except keys).")
+    return ("", 204)
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", os.environ.get("FLASK_RUN_PORT", 5001)))
+    port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, port=port)
