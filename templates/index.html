@@ -7,23 +7,12 @@
 <body>
   <h1>Select File Pairs</h1>
 
-  <!-- Add + Upload buttons in flex row -->
-  <div class="button-row">
-    <form id="addRowForm" method="POST">
-      <button type="button" id="add-row" class="btn">Add another file pair</button>
-    </form>
-
-    <form id="uploadSubmitForm" method="POST" enctype="multipart/form-data">
-      <button type="submit" form="uploadForm" class="btn primary">Upload & Run AI</button>
-    </form>
-  </div>
-
-  <!-- CLEAR button: separate form, keeps JS working -->
-  <form id="clearAllForm" method="post" action="/clear_all_data">
+  <!-- Control buttons row: OUTSIDE the upload form -->
+  <form id="clearAllForm" method="post" action="/clear_all_data" style="display:inline;">
     <button type="submit" class="btn">Clear All Data</button>
   </form>
 
-  <!-- Main upload table -->
+  <!-- Main upload form: only for uploading/running AI -->
   <form id="uploadForm" method="POST" enctype="multipart/form-data">
     <table id="file-pairs-table">
       <thead>
@@ -76,51 +65,56 @@
 
           <td>
             {% if results[i] and results[i].items_detail %}
-              {{ results[i].items_detail }}
+              <div class="items-comparison-side-by-side">
+                {{ results[i].items_detail }}
+              </div>
             {% endif %}
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    <button type="button" id="add-row" class="btn">Add another file pair</button>
+    <button type="submit" class="btn primary">Upload & Run AI</button>
   </form>
 
   <script>
-    // File label change
-    function attachFileListener(input) {
-      input.addEventListener('change', function() {
-        this.nextElementSibling.textContent = this.files[0]?.name || "Choose file";
+    document.addEventListener('DOMContentLoaded', function() {
+      // File label update
+      function attachFileListener(input) {
+        input.addEventListener('change', function() {
+          this.nextElementSibling.textContent = this.files[0]?.name || "Choose file";
+        });
+      }
+      document.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
+
+      // Add new row dynamically
+      document.getElementById("add-row").addEventListener("click", () => {
+        const tbody = document.querySelector('#file-pairs-table tbody');
+        const newRow = tbody.insertRow();
+        newRow.innerHTML = `
+          <td>
+            <label class="file-label"><input type="file" name="fileA[]"><span>Choose file</span></label>
+            <details style="display:none;"><summary>Show JSON A</summary><pre></pre></details>
+          </td>
+          <td>
+            <label class="file-label"><input type="file" name="fileB[]"><span>Choose file</span></label>
+            <details style="display:none;"><summary>Show JSON B</summary><pre></pre></details>
+          </td>
+          <td></td>
+          <td></td>
+        `;
+        newRow.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
       });
-    }
-    document.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
 
-    // Add row dynamically
-    document.getElementById("add-row").addEventListener("click", () => {
-      const tableBody = document.getElementById("file-pairs-table").querySelector('tbody');
-      const newRow = tableBody.insertRow();
-      newRow.innerHTML = `
-        <td>
-          <label class="file-label"><input type="file" name="fileA[]"><span>Choose file</span></label>
-          <details style="display:none;"><summary>Show JSON A</summary><pre></pre></details>
-        </td>
-        <td>
-          <label class="file-label"><input type="file" name="fileB[]"><span>Choose file</span></label>
-          <details style="display:none;"><summary>Show JSON B</summary><pre></pre></details>
-        </td>
-        <td></td>
-        <td></td>
-      `;
-      newRow.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
-    });
-
-    // Clear All Data fetch + reload
-    const clearForm = document.getElementById('clearAllForm');
-    if (clearForm) {
-      clearForm.onsubmit = function(e) {
+      // Clear All Data button handler
+      document.getElementById('clearAllForm').onsubmit = function(e) {
         e.preventDefault();
-        fetch('/clear_all_data', { method: 'POST' }).then(() => window.location.reload());
+        console.log("Clear All Data button clicked");
+        fetch('/clear_all_data', { method: 'POST' })
+          .then(() => window.location.href = "/");
       };
-    }
+    });
   </script>
 </body>
 </html>
