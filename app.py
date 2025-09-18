@@ -1,22 +1,22 @@
-from flask import Flask, render_template, request, session, current_app
+from flask import Flask, render_template, request, session
 import os
-import shutil
-from app_helpers import save_and_process  # your existing save/process logic
+import uuid
+from user_files import get_user_folder, clear_user_files
+from app_helpers import save_and_process
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "supersecret")
 
-UPLOAD_FOLDER = "static/uploads"
-
-def get_upload_folder():
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    return UPLOAD_FOLDER
+@app.before_request
+def assign_user_id():
+    if "user_id" not in session:
+        session["user_id"] = str(uuid.uuid4())
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    folder = get_upload_folder()
+    user_folder = get_user_folder(session["user_id"])
 
-    # initialize session keys
+    # Ensure session lists exist; start with 1 empty row
     if "filenamesA" not in session:
         session["filenamesA"] = [""]
     if "filenamesB" not in session:
@@ -34,8 +34,8 @@ def index():
         num_rows = max(len(filesA), len(filesB), len(filenamesA))
 
         for i in range(num_rows):
-            save_and_process(filesA[i] if i < len(filesA) else None, "A", i, folder)
-            save_and_process(filesB[i] if i < len(filesB) else None, "B", i, folder)
+            save_and_process(filesA[i] if i < len(filesA) else None, "A", i, user_folder)
+            save_and_process(filesB[i] if i < len(filesB) else None, "B", i, user_folder)
 
     return render_template(
         "index.html",
@@ -46,25 +46,15 @@ def index():
 
 @app.route("/clear_all_data", methods=["POST"])
 def clear_all_data():
-    folder = get_upload_folder()
-    current_app.logger.info(f"Clearing files in {folder}: {os.listdir(folder)}")
-
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        try:
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-                current_app.logger.info(f"Deleted file: {file_path}")
-        except Exception as e:
-            current_app.logger.error(f"Failed to delete {file_path}: {e}")
-
-    # Reset session
+    user_id = session.get("user_id")
+    if user_id:
+        clear_user_files(user_id)
     session.clear()
+    # Re-assign user_id so the user keeps their folder for the next session
+    session["user_id"] = user_id if user_id else str(uuid.uuid4())
     session["filenamesA"] = [""]
     session["filenamesB"] = [""]
     session["results"] = [None]
-
-    current_app.logger.info("Session cleared (except keys).")
     return ("", 204)
 
 if __name__ == "__main__":

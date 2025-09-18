@@ -7,11 +7,18 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 logging.basicConfig(level=logging.INFO)
 
-def clear_all_files():
-    """Delete all files in the uploads folder."""
-    logging.info(f"Clearing files in {UPLOAD_FOLDER}: {os.listdir(UPLOAD_FOLDER)}")
-    for filename in os.listdir(UPLOAD_FOLDER):
-        path = os.path.join(UPLOAD_FOLDER, filename)
+def get_user_folder(user_id):
+    """Return the path to the user's upload folder, creating it if needed."""
+    folder = os.path.join(UPLOAD_FOLDER, user_id)
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+def clear_user_files(user_id):
+    """Delete all files in the user's upload folder."""
+    folder = get_user_folder(user_id)
+    logging.info(f"Clearing files in {folder}: {os.listdir(folder)}")
+    for filename in os.listdir(folder):
+        path = os.path.join(folder, filename)
         try:
             if os.path.isfile(path):
                 os.remove(path)
