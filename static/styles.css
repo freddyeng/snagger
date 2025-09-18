@@ -1,84 +1,95 @@
-/* File label styling */
+/* ---------- Theme variables ---------- */
+:root{
+  --font-family: Arial, Helvetica, sans-serif;
+  --base-font-size: 16px;
+  --primary-color: #007BFF;
+  --primary-hover: #0056b3;
+  --border-color: #ccc;
+  --text-color: #222;
+  --bg: #fff;
+  --gap: 12px;
+}
+
+/* ---------- Base page ---------- */
+body {
+  font-family: var(--font-family);
+  font-size: var(--base-font-size);
+  color: var(--text-color);
+  margin: 20px;
+}
+
+/* ---------- File label ---------- */
 .file-label {
   display: block;
   cursor: pointer;
   padding: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   width: 150px;
   text-align: center;
 }
-.file-label input[type="file"] {
-  display: none; /* hide the actual file input */
-}
+.file-label input[type="file"] { display: none; }
 
-/* Table styling */
-table {
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-th, td {
-  padding: 5px 10px;
-  border: 1px solid #999;
-  text-align: center;
-}
+/* ---------- Table styling ---------- */
+table { border-collapse: collapse; margin-bottom: 20px; }
+th, td { padding: 5px 10px; border: 1px solid #999; text-align: center; }
 
-/* Results styling */
-.result {
-  margin-top: 5px;
-  font-size: 0.9em;
-  color: #333;
-}
-
-/* Button styling */
-button {
+/* ---------- Global button styling ---------- */
+button, .btn {
+  font-family: inherit;
+  font-size: 1rem;
   padding: 8px 16px;
-  font-size: 1em;
-  border: 1px solid;
-  color: #333;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg);
+  color: var(--text-color);
   cursor: pointer;
+  line-height: 1.2;
+  min-height: 38px;
+  margin-bottom: 0; /* spacing handled via container */
+}
+button:hover, .btn:hover { background: #f7f7f7; }
+button:focus, .btn:focus { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+/* Primary button */
+button.primary, .btn.primary {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+button.primary:hover, .btn.primary:hover { background: var(--primary-hover); }
+
+/* ---------- Button row layout ---------- */
+.button-row {
+  display: flex;
+  gap: var(--gap);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-/* JSON result styling */
-.result pre {
+/* Clear button: separate form, styled consistently */
+#clearAllForm .btn { /* inherits global button style */ margin-bottom: 16px; }
+
+/* ---------- JSON / result ---------- */
+.result pre, details.json-toggle pre {
   font-family: monospace;
   font-size: 0.9em;
   text-align: left;
   white-space: pre;
   margin-top: 5px;
 }
+details.json-toggle { text-align: left; margin-top: 5px; }
+details.json-toggle summary { cursor: pointer; font-weight: bold; margin-bottom: 2px; }
 
-/* Collapsible JSON styling */
-details.json-toggle {
-  text-align: left;
-  margin-top: 5px;
-}
-details.json-toggle summary {
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 2px;
-}
-details.json-toggle pre {
-  margin-left: 0;
-  font-family: monospace;
-  font-size: 0.9em;
-  white-space: pre;
-}
-
-/* Base table styling for pandas tables */
+/* ---------- Dataframe tables ---------- */
 table.dataframe {
   border-collapse: collapse;
   width: 100%;
   margin-bottom: 0.5em;
 }
-table.dataframe th, table.dataframe td {
-  border: 1px solid #ddd;
-  padding: 0.5em;
-}
-table.dataframe th {
-  background-color: #f2f2f2;
-}
+table.dataframe th, table.dataframe td { border: 1px solid #ddd; padding: 0.5em; }
+table.dataframe th { background-color: #f2f2f2; }
 
-/* Side-by-side layout for formatter tables */
+/* ---------- Side-by-side items comparison ---------- */
 .items-comparison-side-by-side {
   display: flex;
   gap: 2em;
@@ -89,18 +100,9 @@ table.dataframe th {
   min-width: 300px;
 }
 
-/* Buttons layout */
-/* Align buttons to the left above the table */
-.button-row {
-  display: flex;
-  justify-content: flex-start; /* left-aligned */
-  gap: 10px; /* space between button forms */
-  margin-bottom: 15px; /* spacing above table */
-}
-.left-buttons {
-  display: flex;
-  gap: 10px;
-}
-.button-row form {
-  margin: 0; /* remove default form margins */
+/* ---------- Responsive: stack controls on small screens ---------- */
+@media (max-width: 520px) {
+  .button-row { flex-direction: column; }
+  #clearAllForm { display: block; width: 100%; }
+  button, .btn { width: 100%; box-sizing: border-box; }
 }
