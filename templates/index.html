@@ -4,6 +4,28 @@
   <title>File Pairs Upload</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
+<div class="instructions-container">
+  <div class="instructions">
+    <h2>How to Use</h2>
+    <ul>
+      <li>Upload pairs of files you want to compare using the table below.</li>
+      <li>Click <strong>Add another file pair</strong> to add more rows for comparison.</li>
+      <li>Click <strong>Upload & Run AI</strong> to process and compare your files.</li>
+      <li>Use <strong>Clear All Data</strong> to remove your files and reset your session.</li>
+      <li>Your files and results are private and only visible to you.</li>
+    </ul>
+  </div>
+  <div class="instructions">
+    <h2>Understanding the Outputs</h2>
+    <ul>
+      <li><strong>Show JSON A/B:</strong> View the parsed data extracted from each file.</li>
+      <li><strong>Largest Grand Total Table:</strong> Shows the largest total found in each file, with its name and value.</li>
+      <li><strong>Items Table:</strong> Displays a side-by-side comparison of items from both files.</li>
+    </ul>
+  </div>
+</div>
+
 <body>
   <h1>Select File Pairs</h1>
 
@@ -78,7 +100,7 @@
           <td>
             {% if results[i] and results[i].items_detail %}
               <div class="items-comparison-side-by-side">
-                {{ results[i].items_detail }}
+                {{ results[i].items_detail | safe }}
               </div>
             {% endif %}
           </td>
