@@ -19,7 +19,7 @@
         <tr>
           <th>File A</th>
           <th>File B</th>
-          <th>Comparison</th>
+          <th>Totals</th>
           <th>Items</th>
         </tr>
       </thead>
@@ -53,13 +53,25 @@
           </td>
 
           <td>
-            {% if results[i] %}
-              {% if results[i].items_same_size is not none %}
-                <div><strong>Same number of items?</strong> {{ results[i].items_same_size }}</div>
-              {% endif %}
-              {% if results[i].largest_grand_total %}
-                <div><strong>Largest Grand Total:</strong> {{ results[i].largest_grand_total }}</div>
-              {% endif %}
+            {% if results[i] and results[i].largest_grand_totals %}
+              <table class="grand-totals-table">
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>Total Name</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in results[i].largest_grand_totals %}
+                  <tr>
+                    <td>{{ row.source }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.value }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             {% endif %}
           </td>
 
