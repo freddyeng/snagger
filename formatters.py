@@ -13,11 +13,11 @@ def format_items_tables(df1, df2, table_classes="dataframe"):
     combined_html = f"""
     <div class="items-comparison-side-by-side">
         <div class="table-wrapper">
-            <h4>JSON 1 Items</h4>
+            <h4>File A Items</h4>
             {html1}
         </div>
         <div class="table-wrapper">
-            <h4>JSON 2 Items</h4>
+            <h4>File B Items</h4>
             {html2}
         </div>
     </div>
