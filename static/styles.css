@@ -90,19 +90,90 @@ table.dataframe th, table.dataframe td { border: 1px solid #ddd; padding: 0.5em;
 table.dataframe th { background-color: #f2f2f2; }
 
 /* ---------- Side-by-side items comparison ---------- */
+/* Ensure the items-comparison container fits inside the main table cell */
 .items-comparison-side-by-side {
   display: flex;
-  gap: 2em;
-  flex-wrap: wrap;
-}
-.items-comparison-side-by-side .table-wrapper {
-  flex: 1 1 45%;
-  min-width: 300px;
+  gap: 1em;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: flex-start;
 }
 
-/* ---------- Responsive: stack controls on small screens ---------- */
-@media (max-width: 520px) {
-  .button-row { flex-direction: column; }
-  #clearAllForm { display: block; width: 100%; }
-  button, .btn { width: 100%; box-sizing: border-box; }
+/* Make sure the inner tables do not overflow their parent cell */
+.items-comparison-side-by-side table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: none;
+  margin: 0;
+}
+
+.items-comparison-side-by-side th,
+.items-comparison-side-by-side td {
+  border: 1px solid #e0e0e0;
+  padding: 0.3em 0.6em;
+  font-size: 0.95em;
+  text-align: left;
+  word-break: break-word;
+}
+
+/* Prevent horizontal scroll on small screens */
+@media (max-width: 800px) {
+  .items-comparison-side-by-side {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+}
+
+.instructions-container {
+  display: flex;
+  width: 100%;
+  gap: 2em;
+  margin-bottom: 1.5em;
+  flex-wrap: wrap;
+  justify-content: stretch;
+  align-items: stretch;
+}
+
+.instructions {
+  background: #f8f9fa;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 1.2em 1.5em;
+  /* Remove max-width, let flex control width */
+  min-width: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  margin-bottom: 1em;
+  flex: 1 1 0;
+  /* Make sure content doesn't overflow */
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.instructions h2 {
+  margin-top: 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.instructions ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.instructions li {
+  margin-bottom: 0.5em;
+  font-size: 1em;
+  color: #444;
+}
+
+/* Responsive: stack vertically on small screens */
+@media (max-width: 800px) {
+  .instructions-container {
+    flex-direction: column;
+    gap: 1em;
+  }
 }
