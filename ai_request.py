@@ -18,7 +18,7 @@ def ai_request(file: str) -> dict:
     """
 
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "system",
@@ -58,8 +58,39 @@ def ai_request(file: str) -> dict:
                 )
             }
         ],
-        max_tokens=800,
-        response_format={"type": "json_object"}  # ensures JSON object output
+        temperature=0,
+        max_tokens=4000,
+        response_format={"type": "json_object"}
     )
 
+    return response.choices[0].message.content
+
+def ai_request_totals(file: str) -> dict:
+    """
+    Extract ONLY totals as JSON { 'grand_totals': { ... } }.
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a document parser. Return ONLY valid JSON per schema. "
+                    "Extract all totals as key-value pairs exactly as labeled. "
+                    "Convert currency strings to numbers. Do not guess."
+                )
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Extract ONLY totals from this document:\n\n{file}\n\n"
+                    "Schema:\n"
+                    "{ 'grand_totals': {} }"
+                )
+            }
+        ],
+        temperature=0,
+        max_tokens=1500,
+        response_format={"type": "json_object"}
+    )
     return response.choices[0].message.content
