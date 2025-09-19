@@ -5,98 +5,95 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
-<div class="instructions-container">
-  <div class="instructions">
-    <h2>How to Use</h2>
-    <ul>
-      <li>Upload pairs of files you want to compare using the table below.</li>
-      <li>Click <strong>Add another file pair</strong> to add more rows for comparison.</li>
-      <li>Click <strong>Upload & Run AI</strong> to process and compare your files.</li>
-      <li>Use <strong>Clear All Data</strong> to remove your files and reset your session.</li>
-      <li>Your files and results are private and only visible to you.</li>
-    </ul>
-  </div>
-  <div class="instructions">
-    <h2>Understanding the Outputs</h2>
-    <ul>
-      <li><strong>Show JSON A/B:</strong> View the parsed data extracted from each file.</li>
-      <li><strong>Largest Grand Total Table:</strong> Shows the largest total found in each file, with its name and value.</li>
-      <li><strong>Items Table:</strong> Displays a side-by-side comparison of items from both files.</li>
-    </ul>
-  </div>
-</div>
-
 <body>
   <h1>Select File Pairs</h1>
 
-  <!-- Control buttons row: OUTSIDE the upload form -->
-  <form id="clearAllForm" method="post" action="/clear_all_data" style="display:inline;">
-    <button type="submit" class="btn">Clear All Data</button>
-  </form>
+  <div class="instructions-container">
+    <div class="instructions">
+      <h2>How to Use</h2>
+      <ul>
+        <li>Upload pairs of files you want to compare using the table below.</li>
+        <li>Click <strong>Add another file pair</strong> to add more rows for comparison.</li>
+        <li>Click <strong>Upload & Run AI</strong> to process and compare your files.</li>
+        <li>Use <strong>Clear All Data</strong> to remove your files and reset your session.</li>
+        <li>Your files and results are private and only visible to you.</li>
+      </ul>
+    </div>
+    <div class="instructions">
+      <h2>Understanding the Outputs</h2>
+      <ul>
+        <li><strong>Show JSON A/B:</strong> View the parsed data extracted from each file.</li>
+        <li><strong>Largest Grand Total Table:</strong> Shows the largest total found in each file, with its name and value.</li>
+        <li><strong>Items Table:</strong> Displays a side-by-side comparison of items from both files.</li>
+      </ul>
+    </div>
+  </div>
 
-  <!-- Main upload form: only for uploading/running AI -->
+  <!-- Controls with uniform gap -->
+  <div class="uniform-gap-container" style="margin-bottom: 20px;">
+    <form id="clearAllForm" method="post" action="/clear_all_data" style="display:inline;">
+      <button type="submit" class="btn">Clear All Data</button>
+    </form>
+    <button type="button" id="add-row" class="btn">Add another file pair</button>
+    <button type="submit" form="uploadForm" class="btn primary">Upload & Run AI</button>
+  </div>
+
+  <!-- Main upload form -->
   <form id="uploadForm" method="POST" enctype="multipart/form-data">
     <table id="file-pairs-table">
       <thead>
         <tr>
-          <th>File A</th>
-          <th>File B</th>
-          <th>Totals</th>
-          <th>Items</th>
+          <th style="width: 30%;">Files & Totals</th>
+          <th style="width: 70%;">Items Comparison</th>
         </tr>
       </thead>
       <tbody>
         {% for i in range(filenamesA|length) %}
         <tr>
+          <!-- Files + Totals Column -->
           <td>
-            <label class="file-label">
-              <input type="file" name="fileA[]">
-              <span>{{ filenamesA[i] if filenamesA[i] else "Choose file" }}</span>
-            </label>
-            {% if results[i] and results[i].fileA %}
-            <details class="json-toggle">
-              <summary>Show JSON A</summary>
-              <pre>{{ results[i].fileA | tojson(indent=2) }}</pre>
-            </details>
-            {% endif %}
+            <div class="files-totals-container">
+              <!-- File A -->
+              <div class="file-box">
+                <label class="file-label">
+                  <input type="file" name="fileA[]">
+                  <span>{{ filenamesA[i] if filenamesA[i] else "Choose file" }}</span>
+                </label>
+
+                {% if results[i] and results[i].largest_grand_totals %}
+                  <div class="totals">
+                    Total: {{ results[i].largest_grand_totals[0].value if results[i].largest_grand_totals[0] else "-" }}
+                  </div>
+                {% endif %}
+
+                {% if results[i] and results[i].fileA %}
+                  <div class="json-toggle">+</div>
+                  <div class="json-content">{{ results[i].fileA | tojson(indent=2) }}</div>
+                {% endif %}
+              </div>
+
+              <!-- File B -->
+              <div class="file-box">
+                <label class="file-label">
+                  <input type="file" name="fileB[]">
+                  <span>{{ filenamesB[i] if filenamesB[i] else "Choose file" }}</span>
+                </label>
+
+                {% if results[i] and results[i].largest_grand_totals %}
+                  <div class="totals">
+                    Total: {{ results[i].largest_grand_totals[1].value if results[i].largest_grand_totals[1] else "-" }}
+                  </div>
+                {% endif %}
+
+                {% if results[i] and results[i].fileB %}
+                  <div class="json-toggle">+</div>
+                  <div class="json-content">{{ results[i].fileB | tojson(indent=2) }}</div>
+                {% endif %}
+              </div>
+            </div>
           </td>
 
-          <td>
-            <label class="file-label">
-              <input type="file" name="fileB[]">
-              <span>{{ filenamesB[i] if filenamesB[i] else "Choose file" }}</span>
-            </label>
-            {% if results[i] and results[i].fileB %}
-            <details class="json-toggle">
-              <summary>Show JSON B</summary>
-              <pre>{{ results[i].fileB | tojson(indent=2) }}</pre>
-            </details>
-            {% endif %}
-          </td>
-
-          <td>
-            {% if results[i] and results[i].largest_grand_totals %}
-              <table class="grand-totals-table">
-                <thead>
-                  <tr>
-                    <th>Source</th>
-                    <th>Total Name</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for row in results[i].largest_grand_totals %}
-                  <tr>
-                    <td>{{ row.source }}</td>
-                    <td>{{ row.name }}</td>
-                    <td>{{ row.value }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% endif %}
-          </td>
-
+          <!-- Items Comparison Column -->
           <td>
             {% if results[i] and results[i].items_detail %}
               <div class="items-comparison-side-by-side">
@@ -108,8 +105,6 @@
         {% endfor %}
       </tbody>
     </table>
-    <button type="button" id="add-row" class="btn">Add another file pair</button>
-    <button type="submit" class="btn primary">Upload & Run AI</button>
   </form>
 
   <script>
@@ -128,26 +123,69 @@
         const newRow = tbody.insertRow();
         newRow.innerHTML = `
           <td>
-            <label class="file-label"><input type="file" name="fileA[]"><span>Choose file</span></label>
-            <details style="display:none;"><summary>Show JSON A</summary><pre></pre></details>
+            <div class="files-totals-container">
+              <div class="file-box">
+                <label class="file-label"><input type="file" name="fileA[]"><span>Choose file</span></label>
+                <div class="totals"></div>
+                <div class="json-toggle">+</div>
+                <div class="json-content"></div>
+              </div>
+              <div class="file-box">
+                <label class="file-label"><input type="file" name="fileB[]"><span>Choose file</span></label>
+                <div class="totals"></div>
+                <div class="json-toggle">+</div>
+                <div class="json-content"></div>
+              </div>
+            </div>
           </td>
-          <td>
-            <label class="file-label"><input type="file" name="fileB[]"><span>Choose file</span></label>
-            <details style="display:none;"><summary>Show JSON B</summary><pre></pre></details>
-          </td>
-          <td></td>
           <td></td>
         `;
         newRow.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
       });
 
-      // Clear All Data button handler
+      // Clear All Data button
       document.getElementById('clearAllForm').onsubmit = function(e) {
         e.preventDefault();
-        console.log("Clear All Data button clicked");
-        fetch('/clear_all_data', { method: 'POST' })
-          .then(() => window.location.href = "/");
+        fetch('/clear_all_data', { method: 'POST' }).then(() => window.location.href = "/");
       };
+
+      // JSON toggle
+      document.querySelectorAll('.json-toggle').forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+          e.stopPropagation(); // Prevent event from bubbling up
+
+          // Close all other JSON boxes
+          document.querySelectorAll('.json-toggle').forEach(t => {
+            if (t !== this) {
+              t.classList.remove('active');
+              const content = t.nextElementSibling;
+              if (content && content.classList.contains('json-content')) {
+                content.style.display = 'none';
+              }
+            }
+          });
+
+          // Toggle this one
+          this.classList.toggle('active');
+          const content = this.nextElementSibling;
+          if (content && content.classList.contains('json-content')) {
+            content.style.display = this.classList.contains('active') ? 'block' : 'none';
+          }
+        });
+      });
+
+      // Close all JSON boxes when clicking anywhere outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.json-toggle') && !e.target.closest('.json-content')) {
+          document.querySelectorAll('.json-toggle').forEach(toggle => {
+            toggle.classList.remove('active');
+            const content = toggle.nextElementSibling;
+            if (content && content.classList.contains('json-content')) {
+              content.style.display = 'none';
+            }
+          });
+        }
+      });
     });
   </script>
 </body>

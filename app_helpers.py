@@ -63,8 +63,8 @@ def save_and_process(file, side, index, upload_folder):
                 "fileB": prevB,
                 "items_same_size": items_count_equal(result, prevB) if prevB is not None else None,
                 "largest_grand_totals": [
-                    {"source": "File A", "name": gt["json1_key"], "value": gt["json1_value"]},
-                    {"source": "File B", "name": gt["json2_key"], "value": gt["json2_value"]}
+                    {"source": "Invoice", "name": gt["json1_key"], "value": gt["json1_value"]},
+                    {"source": "PO", "name": gt["json2_key"], "value": gt["json2_value"]}
                 ] if gt and prevB is not None else None,
                 "items_detail": format_items_tables(
                     *items_comparison(result, prevB).values()
@@ -77,8 +77,8 @@ def save_and_process(file, side, index, upload_folder):
                 "fileB": result,
                 "items_same_size": items_count_equal(prevA, result) if prevA is not None else None,
                 "largest_grand_totals": [
-                    {"source": "File A", "name": gt["json1_key"], "value": gt["json1_value"]},
-                    {"source": "File B", "name": gt["json2_key"], "value": gt["json2_value"]}
+                    {"source": "Invoice", "name": gt["json1_key"], "value": gt["json1_value"]},
+                    {"source": "PO", "name": gt["json2_key"], "value": gt["json2_value"]}
                 ] if gt and prevA is not None else None,
                 "items_detail": format_items_tables(
                     *items_comparison(prevA, result).values()
