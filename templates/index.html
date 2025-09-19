@@ -23,13 +23,13 @@
       <h2>Understanding the Outputs</h2>
       <ul>
         <li><strong>Show JSON A/B:</strong> View the parsed data extracted from each file.</li>
-        <li><strong>Largest Grand Total Table:</strong> Shows the largest total found in each file, with its name and value.</li>
-        <li><strong>Items Table:</strong> Displays a side-by-side comparison of items from both files.</li>
+        <li><strong>Largest Grand Total:</strong> Shows the largest total found in each file.</li>
+        <li><strong>Items Table:</strong> Displays the items for each file in its own column.</li>
       </ul>
     </div>
   </div>
 
-  <!-- Controls with uniform gap -->
+  <!-- Controls -->
   <div class="uniform-gap-container" style="margin-bottom: 20px;">
     <form id="clearAllForm" method="post" action="/clear_all_data" style="display:inline;">
       <button type="submit" class="btn">Clear All Data</button>
@@ -38,13 +38,14 @@
     <button type="submit" form="uploadForm" class="btn primary">Upload & Run AI</button>
   </div>
 
-  <!-- Main upload form -->
+  <!-- Main form -->
   <form id="uploadForm" method="POST" enctype="multipart/form-data">
     <table id="file-pairs-table">
       <thead>
         <tr>
           <th style="width: 30%;">Files & Totals</th>
-          <th style="width: 70%;">Items Comparison</th>
+          <th style="width: 35%;">Invoice Items</th>
+          <th style="width: 35%;">PO Items</th>
         </tr>
       </thead>
       <tbody>
@@ -59,32 +60,32 @@
                   <input type="file" name="fileA[]">
                   <span>{{ filenamesA[i] if filenamesA[i] else "Choose file" }}</span>
                 </label>
-
-                {% if results[i] and results[i].largest_grand_totals %}
+    
+                {% if results[i] and results[i].largest_grand_total_A %}
                   <div class="totals">
-                    Total: {{ results[i].largest_grand_totals[0].value if results[i].largest_grand_totals[0] else "-" }}
+                    Total: {{ results[i].largest_grand_total_A.json_value if results[i].largest_grand_total_A.json_value else "-" }}
                   </div>
                 {% endif %}
-
+    
                 {% if results[i] and results[i].fileA %}
                   <div class="json-toggle">+</div>
                   <div class="json-content">{{ results[i].fileA | tojson(indent=2) }}</div>
                 {% endif %}
               </div>
-
+    
               <!-- File B -->
               <div class="file-box">
                 <label class="file-label">
                   <input type="file" name="fileB[]">
                   <span>{{ filenamesB[i] if filenamesB[i] else "Choose file" }}</span>
                 </label>
-
-                {% if results[i] and results[i].largest_grand_totals %}
+    
+                {% if results[i] and results[i].largest_grand_total_B %}
                   <div class="totals">
-                    Total: {{ results[i].largest_grand_totals[1].value if results[i].largest_grand_totals[1] else "-" }}
+                    Total: {{ results[i].largest_grand_total_B.json_value if results[i].largest_grand_total_B.json_value else "-" }}
                   </div>
                 {% endif %}
-
+    
                 {% if results[i] and results[i].fileB %}
                   <div class="json-toggle">+</div>
                   <div class="json-content">{{ results[i].fileB | tojson(indent=2) }}</div>
@@ -92,24 +93,28 @@
               </div>
             </div>
           </td>
-
-          <!-- Items Comparison Column -->
+    
+          <!-- Invoice Items Column -->
           <td>
-            {% if results[i] and results[i].items_detail %}
-              <div class="items-comparison-side-by-side">
-                {{ results[i].items_detail | safe }}
-              </div>
+            {% if results[i] and results[i].items_table_A %}
+              {{ results[i].items_table_A | safe }}
+            {% endif %}
+          </td>
+    
+          <!-- PO Items Column -->
+          <td>
+            {% if results[i] and results[i].items_table_B %}
+              {{ results[i].items_table_B | safe }}
             {% endif %}
           </td>
         </tr>
         {% endfor %}
       </tbody>
-    </table>
+    </table>    
   </form>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // File label update
       function attachFileListener(input) {
         input.addEventListener('change', function() {
           this.nextElementSibling.textContent = this.files[0]?.name || "Choose file";
@@ -117,7 +122,6 @@
       }
       document.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
 
-      // Add new row dynamically
       document.getElementById("add-row").addEventListener("click", () => {
         const tbody = document.querySelector('#file-pairs-table tbody');
         const newRow = tbody.insertRow();
@@ -139,50 +143,39 @@
             </div>
           </td>
           <td></td>
+          <td></td>
         `;
         newRow.querySelectorAll('.file-label input[type="file"]').forEach(attachFileListener);
       });
 
-      // Clear All Data button
       document.getElementById('clearAllForm').onsubmit = function(e) {
         e.preventDefault();
         fetch('/clear_all_data', { method: 'POST' }).then(() => window.location.href = "/");
       };
 
-      // JSON toggle
+      // JSON toggle logic
       document.querySelectorAll('.json-toggle').forEach(toggle => {
         toggle.addEventListener('click', function(e) {
-          e.stopPropagation(); // Prevent event from bubbling up
-
-          // Close all other JSON boxes
+          e.stopPropagation();
           document.querySelectorAll('.json-toggle').forEach(t => {
             if (t !== this) {
               t.classList.remove('active');
               const content = t.nextElementSibling;
-              if (content && content.classList.contains('json-content')) {
-                content.style.display = 'none';
-              }
+              if (content) content.style.display = 'none';
             }
           });
-
-          // Toggle this one
           this.classList.toggle('active');
           const content = this.nextElementSibling;
-          if (content && content.classList.contains('json-content')) {
-            content.style.display = this.classList.contains('active') ? 'block' : 'none';
-          }
+          if (content) content.style.display = this.classList.contains('active') ? 'block' : 'none';
         });
       });
 
-      // Close all JSON boxes when clicking anywhere outside
       document.addEventListener('click', function(e) {
         if (!e.target.closest('.json-toggle') && !e.target.closest('.json-content')) {
           document.querySelectorAll('.json-toggle').forEach(toggle => {
             toggle.classList.remove('active');
             const content = toggle.nextElementSibling;
-            if (content && content.classList.contains('json-content')) {
-              content.style.display = 'none';
-            }
+            if (content) content.style.display = 'none';
           });
         }
       });

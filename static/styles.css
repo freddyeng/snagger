@@ -94,14 +94,14 @@ button.primary:hover, .btn.primary:hover { background: var(--primary-hover); }
   gap: 20px;
   align-items: flex-start;
   width: 100%;
-  position: relative; /* reference for JSON overlays */
+  position: relative;
 }
 
 .json-content {
   display: none;
   position: absolute;
-  top: 100%;      /* directly below the files row */
-  left: 0;        /* aligned to the left of the container */
+  top: 100%;
+  left: 0;
   width: 350px;
   max-width: 90vw;
   max-height: 200px;
@@ -119,10 +119,7 @@ button.primary:hover, .btn.primary:hover { background: var(--primary-hover); }
   z-index: 10;
 }
 
-/* Show the JSON overlay when toggle is active */
-.json-toggle.active + .json-content {
-  display: block;
-}
+.json-toggle.active + .json-content { display: block; }
 
 /* ---------- Dataframe / totals tables ---------- */
 table.dataframe, table.grand-totals-table {
@@ -137,7 +134,7 @@ table.dataframe th, table.dataframe td, table.grand-totals-table th, table.grand
 }
 table.dataframe th, table.grand-totals-table th { background-color: #f2f2f2; }
 
-/* ---------- File + totals + items layout ---------- */
+/* ---------- File + totals layout ---------- */
 .file-box {
   display: flex;
   flex-direction: column;
@@ -145,7 +142,7 @@ table.dataframe th, table.grand-totals-table th { background-color: #f2f2f2; }
   flex: 1 1 0;
   min-width: 0;
   align-items: flex-start;
-  position: relative; /* needed for internal JSON toggles */
+  position: relative;
 }
 
 .file-label,
@@ -161,48 +158,12 @@ table.dataframe th, table.grand-totals-table th { background-color: #f2f2f2; }
   font-size: 0.95em;
   min-width: 140px;
 }
-/* ---------- Side-by-side items comparison ---------- */
-.items-comparison-side-by-side {
-  display: flex;
-  gap: 1em;
+
+/* ---------- Table wrapper for individual items tables ---------- */
+.table-wrapper {
   width: 100%;
   box-sizing: border-box;
-  align-items: flex-start;
-  min-width: 0;
-}
-
-/* Each table takes equal space and fills the column */
-.items-comparison-side-by-side table {
-  flex: 1;
-  border-collapse: collapse;
-  background: #fff;
-  box-shadow: none;
-  margin: 0;
-  min-width: 0;
-  table-layout: fixed; /* Forces equal column widths */
-}
-
-/* Table cells */
-.items-comparison-side-by-side th,
-.items-comparison-side-by-side td {
-  border: 1px solid #e0e0e0;
-  padding: 0.3em 0.6em;
-  font-size: 0.95em;
-  text-align: left;
-  word-break: break-word;
-  min-width: 0;
-}
-
-/* Ensure the table cell containing the items comparison takes full width */
-td:has(.items-comparison-side-by-side) {
-  width: 70%;
-  padding: 10px; /* Add some padding back */
-}
-
-/* Alternative if :has() isn't supported */
-.items-comparison-cell {
-  width: 70%;
-  padding: 10px; /* Add some padding back */
+  margin-bottom: 1em;
 }
 
 /* ---------- Instructions container ---------- */
@@ -236,7 +197,6 @@ td:has(.items-comparison-side-by-side) {
 /* ---------- Responsive adjustments ---------- */
 @media (max-width: 1000px) {
   .files-totals-container { flex-direction: column; gap: 12px; }
-  .items-comparison-side-by-side { flex-direction: column; gap: 0.5em; }
 }
 @media (max-width: 800px) {
   .instructions-container { flex-direction: column; gap: 1em; }
