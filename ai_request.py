@@ -29,6 +29,8 @@ def ai_request(file: str) -> dict:
                     "For each item, if there is extra information, please add as an array inside 'notes'."
                     "Extract all totals as key-value pairs."
                     "The key should be exactly the text label found in the document (before the number)."
+                    "When extracting items, if you find a string (such as a product code, fabric name, or label) that appears repeatedly or is 'floating' near multiple items, and it is not clearly associated with only one item, include that string in the notes for each item it appears near. "
+                    "If a string appears immediately before or after an item’s details, and is not a header or total, treat it as a note for that item. "
                     "If the value is on the next line, still capture it."
                     "Remove currency symbols and convert to numbers."
                     "Include all totals found; do not guess missing ones."
